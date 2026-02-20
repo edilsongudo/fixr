@@ -48,7 +48,7 @@ def search_events(limit=50):
     response = requests.get(url, headers=HEADERS, params=params)
     
     # Always show response, even if there's an error
-    print(f"Status: {response.status_code}", flush=True)
+    print(f"[API] Status code: {response.status_code}", flush=True)
     
     try:
         data = response.json()
@@ -70,19 +70,22 @@ if __name__ == "__main__":
     lat = float(os.getenv('FIXR_LAT', '-25.9655'))
     lon = float(os.getenv('FIXR_LON', '32.5832'))
     
-    print(f"Starting bot - random interval between {min_interval}s and {max_interval}s", flush=True)
-    print(f"Search coordinates: lat={lat}, lon={lon}\n", flush=True)
+    print(f"[BOT STARTED] 🚀 Bot is running...", flush=True)
+    print(f"[CONFIG] Random interval between {min_interval}s and {max_interval}s", flush=True)
+    print(f"[CONFIG] Search coordinates: lat={lat}, lon={lon}\n", flush=True)
     
     while True:
         try:
+            print(f"[SEARCHING] 🔍 Searching for events...", flush=True)
             data = search_events()
             
             if data and isinstance(data, dict):
                 events = data.get('results', [])
-                print(f"\n🎫 Found {len(events)} events\n", flush=True)
+                print(f"[RESULTS] ✅ Found {len(events)} events\n", flush=True)
                 
                 # Find first available event
                 first_available_event = None
+                print(f"[PARSING] 📊 Parsing event details...\n", flush=True)
                 
                 for event in events:
                     print(f"• {event.get('name', 'N/A')}", flush=True)
@@ -96,7 +99,7 @@ if __name__ == "__main__":
                     
                     # Sold out status
                     is_sold_out = event.get('is_sold_out', False)
-                    sold_out_status = "🔴 SOLD OUT" if is_sold_out else "🟢 Available"
+                    sold_out_status = "🔴 SOLD OUT" if is_sold_out else "🟢 AVAILABLE"
                     print(f"  Status: {sold_out_status}", flush=True)
                     
                     # Prices
@@ -137,27 +140,28 @@ if __name__ == "__main__":
                 
                 # Get details of first available event
                 if first_available_event:
-                    event_id = first_available_event.get('id')
-                    print(f"\n📋 Fetching details for first available event (ID: {event_id})...\n", flush=True)
+                    # event_id = first_available_event.get('id')
+                    event_id = 378646080
+                    print(f"\n[FETCHING] 📋 Fetching details for first available event (ID: {event_id})...\n", flush=True)
                     try:
                         event_details = get_event_details(event_id)
                         if event_details:
-                            print(f"\n✅ Event details retrieved successfully\n", flush=True)
+                            print(f"\n[SUCCESS] ✅ Event details retrieved successfully\n", flush=True)
                     except Exception as e:
-                        print(f"❌ Error fetching event details: {e}\n", flush=True)
+                        print(f"[ERROR] ❌ Error fetching event details: {e}\n", flush=True)
                 else:
-                    print(f"\n⚠️  No available events found\n", flush=True)
+                    print(f"\n[INFO] ⚠️  No available events found at this moment\n", flush=True)
             
             # Random interval before next request
             interval = random.randint(min_interval, max_interval)
-            print(f"\n⏳ Waiting {interval}s before next request...\n", flush=True)
+            print(f"\n[WAITING] ⏳ Waiting {interval}s before next request...\n", flush=True)
             time.sleep(interval)
             
         except KeyboardInterrupt:
-            print("\n👋 Stopping bot...", flush=True)
+            print("\n[STOP] 👋 Bot stopped by user.", flush=True)
             break
         except Exception as e:
-            print(f"Error: {e}", flush=True)
+            print(f"[ERROR] ❌ Error: {e}", flush=True)
             interval = random.randint(min_interval, max_interval)
-            print(f"Waiting {interval}s before retrying...\n", flush=True)
+            print(f"[RETRY] 🔄 Retrying in {interval}s...\n", flush=True)
             time.sleep(interval)

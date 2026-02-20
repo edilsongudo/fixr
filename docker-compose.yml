@@ -12,6 +12,7 @@ services:
       - ./data:/app/data
       - ./ticket_bot.py:/app/ticket_bot.py
       - ./event_details.py:/app/event_details.py
+      # add_to_cart functionality consolidated into event_details.py
     environment:
       - PYTHONUNBUFFERED=1
     env_file:
